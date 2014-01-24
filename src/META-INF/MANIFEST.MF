@@ -6,5 +6,5 @@ Class-Path: postgresql-9.3-1100.jdbc41.jar gdx.jar gdx-natives.jar gdx
   gdx-backend-lwjgl-sources.jar gdx-controllers-desktop-natives.jar gd
  x-controllers-desktop-sources.jar scala-actors.jar scala-library.jar
  scala-swing.jar
-Main-Class: com.deweyvm.dogue.server.Main
+Main-Class: com.deweyvm.dogue.starfire.Main
 

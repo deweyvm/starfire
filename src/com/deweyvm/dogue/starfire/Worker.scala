@@ -1,4 +1,4 @@
-package com.deweyvm.dogue.server
+package com.deweyvm.dogue.starfire
 
 import com.deweyvm.gleany.Debug
 import com.deweyvm.gleany.net.Task

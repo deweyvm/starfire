@@ -1,4 +1,4 @@
-package com.deweyvm.dogue.server
+package com.deweyvm.dogue.starfire
 
 import java.net.Socket
 import scala.collection.mutable.ArrayBuffer

@@ -1,9 +1,9 @@
-package com.deweyvm.dogue.server
+package com.deweyvm.dogue.starfire
 
 import com.deweyvm.gleany.logging.Logger
 import com.deweyvm.dogue.common.Implicits._
 import com.deweyvm.dogue.common.logging.Log
-import com.deweyvm.dogue.server.db.DbConnection
+import com.deweyvm.dogue.starfire.db.DbConnection
 
 object Main {
   def main(args:Array[String]) {
