@@ -17,7 +17,6 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="gleany" />
-    <orderEntry type="module" module-name="whatever-common" />
     <orderEntry type="library" name="scala-library" level="application" />
     <orderEntry type="library" name="libs" level="project" />
     <orderEntry type="module-library">
@@ -30,6 +29,7 @@
         <jarDirectory url="file://$MODULE_DIR$/libs" recursive="false" />
       </library>
     </orderEntry>
+    <orderEntry type="module" module-name="dogue-common" />
   </component>
 </module>
 
