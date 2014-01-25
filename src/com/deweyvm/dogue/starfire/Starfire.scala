@@ -1,12 +1,12 @@
 package com.deweyvm.dogue.starfire
 
 import java.net.{SocketTimeoutException, ServerSocket}
-import com.deweyvm.gleany.net.Task
 import com.deweyvm.dogue.common.Implicits._
 import com.deweyvm.dogue.common.logging.Log
+import com.deweyvm.dogue.common.threading.Task
 
 
-class Server extends Task {
+class Starfire extends Task {
   val port = 4815
   var running = true
   //this doesnt scale to more than 1 concurrent connection

@@ -2,15 +2,15 @@ package com.deweyvm.dogue.starfire
 
 import java.net.Socket
 import scala.collection.mutable.ArrayBuffer
-import com.deweyvm.gleany.net.Task
 import java.io.InputStream
 import com.deweyvm.dogue.common.Implicits._
 import com.deweyvm.gleany.Debug
 import com.deweyvm.dogue.common.data.Encoding
 import com.deweyvm.dogue.common.logging.Log
+import com.deweyvm.dogue.common.threading.Task
 
 
-class Reader(socket:Socket, parent:Server) extends Task {
+class Reader(socket:Socket, parent:Starfire) extends Task {
   private var running = true
   private val inBuffer = ArrayBuffer[String]()
   private var current = ""

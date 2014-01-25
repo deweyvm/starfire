@@ -16,6 +16,7 @@ object Main {
       }
     Log.setDirectory(logDir)
     //new DbConnection
-    new Server().start()
+    new Starfire().start()
   }
 }
+
