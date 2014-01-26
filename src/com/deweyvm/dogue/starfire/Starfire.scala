@@ -10,7 +10,7 @@ class Starfire extends Task {
   val port = 4815
   var running = true
   //this doesnt scale to more than 1 concurrent connection
-  var currentReader:Option[Reader] = None
+  var currentReader:Option[StarReader] = None
   override def execute() {
     Log.info("Starting server")
     val server = new ServerSocket(port)
@@ -24,7 +24,7 @@ class Starfire extends Task {
           _.kill()
         }
         Log.info("Spawning reader")
-        val reader = new Reader(connection, this)
+        val reader = new StarReader(connection, this)
         reader.start()
         currentReader = reader.some
       } catch {

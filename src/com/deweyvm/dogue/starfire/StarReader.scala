@@ -10,7 +10,7 @@ import com.deweyvm.dogue.common.logging.Log
 import com.deweyvm.dogue.common.threading.Task
 
 
-class Reader(socket:Socket, parent:Starfire) extends Task {
+class StarReader(socket:Socket, parent:Starfire) extends Task {
   private var running = true
   private val inBuffer = ArrayBuffer[String]()
   private var current = ""
@@ -38,7 +38,7 @@ class Reader(socket:Socket, parent:Starfire) extends Task {
         current = last
 
         for (s <- inBuffer) {
-          new Worker(s, socket/*fixme should probably be another socket?*/).start()
+          new StarWorker(s, socket/*fixme should probably be another socket?*/).start()
         }
         inBuffer.clear()
       }
