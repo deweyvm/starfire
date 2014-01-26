@@ -2,7 +2,7 @@ package com.deweyvm.dogue.starfire
 
 import com.deweyvm.dogue.common.logging.Log
 
-case class StarfireOptions(logDir:String=".")
+
 
 
 object Main {
