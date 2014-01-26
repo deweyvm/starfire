@@ -23,8 +23,10 @@ class Reader(socket:Socket, parent:Starfire) extends Task {
 
   override def execute() {
     while(running && !socket.isClosed) {
+      Log.info("Reading data")
       val read = socket.receive()
       read foreach { next =>
+        Log.info("Got data: " + next)
         val lines = next.esplit('\0')
         val last = lines(lines.length - 1)
         val first = lines.dropRight(1)
