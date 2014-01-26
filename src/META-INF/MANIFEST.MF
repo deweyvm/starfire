@@ -1,10 +1,10 @@
 Manifest-Version: 1.0
-Class-Path: scala-actors.jar scala-library.jar scala-swing.jar gdx.jar
-  gdx-natives.jar gdx-sources.jar gdx-freetype.jar gdx-controllers.jar
-  gdx-backend-lwjgl.jar gdx-freetype-natives.jar gdx-freetype-sources.
- jar gdx-controllers-desktop.jar gdx-controllers-sources.jar gdx-backe
- nd-lwjgl-natives.jar gdx-backend-lwjgl-sources.jar gdx-controllers-de
- sktop-natives.jar gdx-controllers-desktop-sources.jar postgresql-9.3-
- 1100.jdbc41.jar
+Class-Path: postgresql-9.3-1100.jdbc41.jar scopt_2.10-3.2.0.jar gdx.ja
+ r gdx-natives.jar gdx-sources.jar gdx-freetype.jar gdx-controllers.ja
+ r gdx-backend-lwjgl.jar gdx-freetype-natives.jar gdx-freetype-sources
+ .jar gdx-controllers-desktop.jar gdx-controllers-sources.jar gdx-back
+ end-lwjgl-natives.jar gdx-backend-lwjgl-sources.jar gdx-controllers-d
+ esktop-natives.jar gdx-controllers-desktop-sources.jar scala-actors.j
+ ar scala-library.jar scala-swing.jar
 Main-Class: com.deweyvm.dogue.starfire.Main
 

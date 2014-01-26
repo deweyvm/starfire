@@ -2,21 +2,29 @@ package com.deweyvm.dogue.starfire
 
 import com.deweyvm.dogue.common.logging.Log
 
+case class StarfireOptions(logDir:String=".")
+
+
 object Main {
   def main(args:Array[String]) {
-    if (args.contains("--pass")) {
-      System.exit(0)
+
+
+    val parser = new scopt.OptionParser[StarfireOptions]("starfire") {
+      head("starfire", "testing.0")
+
+      opt[String]("log") action { (x, c) =>
+        c.copy(logDir = x)
+      } text "directory to place logs"
+
     }
-    val logIndex = args.indexOf("--log")
-    val logDir =
-      if (logIndex != -1) {
-        args(logIndex + 1)
-      } else {
-        "."
-      }
-    Log.setDirectory(logDir)
-    //new DbConnection
-    new Starfire().start()
+    parser.parse(args, StarfireOptions()) map { c =>
+      Log.setDirectory(c.logDir)
+      new Starfire().start()
+    } getOrElse {
+      println(parser.usage)
+      throw new RuntimeException("invalid args")
+    }
+
   }
 }
 

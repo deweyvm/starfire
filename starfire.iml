@@ -30,6 +30,7 @@
       </library>
     </orderEntry>
     <orderEntry type="module" module-name="dogue-common" />
+    <orderEntry type="library" name="scopt_2.10-3.2.0" level="application" />
   </component>
 </module>
 
