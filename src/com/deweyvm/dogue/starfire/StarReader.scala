@@ -10,7 +10,7 @@ import com.deweyvm.dogue.common.logging.Log
 import com.deweyvm.dogue.common.threading.Task
 
 
-class StarReader(socket:Socket, parent:Starfire) extends Task {
+class StarReader(socket:Socket, parent:Starfire, id:Int) extends Task {
   private var running = true
   private val inBuffer = ArrayBuffer[String]()
   private var current = ""
@@ -23,7 +23,7 @@ class StarReader(socket:Socket, parent:Starfire) extends Task {
 
   override def execute() {
     while(running && !socket.isClosed) {
-      Log.info("Reading data")
+      Log.info("Reading " + id)
       val read = socket.receive()
       read foreach { next =>
         Log.info("Got data: " + next)
@@ -42,11 +42,10 @@ class StarReader(socket:Socket, parent:Starfire) extends Task {
         }
         inBuffer.clear()
       }
-      if (!read.isEmpty) {
+      if (read.isEmpty) {
         Thread.sleep(350)
       }
     }
-    running = false
     Log.info("Reader closed")
   }
 

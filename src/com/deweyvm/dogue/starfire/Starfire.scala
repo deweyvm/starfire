@@ -9,6 +9,7 @@ import com.deweyvm.dogue.common.threading.Task
 class Starfire {
   val port = 4815
   var running = true
+  var readers = 0
   //this doesnt scale to more than 1 concurrent connection
   var currentReader:Option[StarReader] = None
   def execute() {
@@ -23,7 +24,8 @@ class Starfire {
         _.kill()
       }
       Log.info("Spawning reader")
-      val reader = new StarReader(connection, this)
+      val reader = new StarReader(connection, this, reader)
+      readers += 1
       reader.start()
       currentReader = reader.some
 
