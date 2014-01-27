@@ -19,7 +19,7 @@ object Main {
     }
     parser.parse(args, StarfireOptions()) map { c =>
       Log.setDirectory(c.logDir)
-      new Starfire().start()
+      new Starfire().execute()
     } getOrElse {
       println(parser.usage)
       throw new RuntimeException("invalid args")

@@ -1,10 +1,8 @@
 package com.deweyvm.dogue.starfire
 
-import com.deweyvm.gleany.Debug
 import com.deweyvm.dogue.common.Implicits._
 import com.deweyvm.dogue.common.Functions._
 import java.net.Socket
-import com.deweyvm.dogue.common.data.Encoding
 import com.deweyvm.dogue.common.logging.Log
 import com.deweyvm.dogue.common.threading.Task
 

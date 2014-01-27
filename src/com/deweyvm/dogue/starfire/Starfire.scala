@@ -6,12 +6,12 @@ import com.deweyvm.dogue.common.logging.Log
 import com.deweyvm.dogue.common.threading.Task
 
 
-class Starfire extends Task {
+class Starfire {
   val port = 4815
   var running = true
   //this doesnt scale to more than 1 concurrent connection
   var currentReader:Option[StarReader] = None
-  override def execute() {
+  def execute() {
     Log.info("Starting server")
     val server = new ServerSocket(port)
     Log.info("Server started successfully")

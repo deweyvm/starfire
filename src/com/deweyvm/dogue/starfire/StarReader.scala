@@ -47,7 +47,7 @@ class StarReader(socket:Socket, parent:Starfire) extends Task {
       }
     }
     running = false
-    Log.info("Killed")
+    Log.info("Reader closed")
   }
 
 
