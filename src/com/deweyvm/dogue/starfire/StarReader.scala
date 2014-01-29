@@ -23,7 +23,6 @@ class StarReader(socket:Socket, parent:Starfire, id:Int) extends Task {
 
   override def execute() {
     while(running && !socket.isClosed) {
-      Log.info("Reading " + id)
       val read = socket.receive()
       read foreach { next =>
         Log.info("Got data: " + next)
