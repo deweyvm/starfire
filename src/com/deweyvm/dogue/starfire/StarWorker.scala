@@ -18,7 +18,7 @@ class StarWorker(string:String, socket:Socket) extends Task {
     if (command == "/quit") {
       Log.info("don't know how to quit :(")
     } else if (command == "/say") {
-      Log.info("saying \"%s\" to the server" format rest)
+      Log.info("saying \"%s\" to all clients" format rest)
       socket.transmit(rest)
     }
   }

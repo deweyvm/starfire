@@ -24,7 +24,7 @@ class Starfire {
         _.kill()
       }
       Log.info("Spawning reader")
-      val reader = new StarReader(connection, this, reader)
+      val reader = new StarReader(connection, this, readers)
       readers += 1
       reader.start()
       currentReader = reader.some
