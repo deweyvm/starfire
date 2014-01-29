@@ -2,10 +2,7 @@ package com.deweyvm.dogue.starfire
 
 import java.net.Socket
 import scala.collection.mutable.ArrayBuffer
-import java.io.InputStream
 import com.deweyvm.dogue.common.Implicits._
-import com.deweyvm.gleany.Debug
-import com.deweyvm.dogue.common.data.Encoding
 import com.deweyvm.dogue.common.logging.Log
 import com.deweyvm.dogue.common.threading.Task
 
@@ -15,12 +12,15 @@ class StarReader(socket:Socket, parent:Starfire, id:Int) extends Task {
   private val inBuffer = ArrayBuffer[String]()
   private var current = ""
 
+  private val ponger = new StarPong(this)
+  ponger.start()
   def isRunning:Boolean = running
 
   def kill() {
     running = false
+    Log.info("Attempting to kill reader thread")
   }
-
+  socket.setSoTimeout(500)
   override def execute() {
     while(running && !socket.isClosed) {
       val read = socket.receive()
@@ -37,15 +37,16 @@ class StarReader(socket:Socket, parent:Starfire, id:Int) extends Task {
         current = last
 
         for (s <- inBuffer) {
-          new StarWorker(s, socket/*fixme should probably be another socket?*/).start()
+          new StarWorker(s, this, socket/*fixme should probably be a different socket?*/).start()
         }
         inBuffer.clear()
       }
-      if (read.isEmpty) {
-        Thread.sleep(350)
-      }
     }
     Log.info("Reader closed")
+  }
+
+  def pong() {
+    ponger.pong()
   }
 
 

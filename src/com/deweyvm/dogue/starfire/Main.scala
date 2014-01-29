@@ -18,7 +18,7 @@ object Main {
 
     }
     parser.parse(args, StarfireOptions()) map { c =>
-      Log.setDirectory(c.logDir)
+      Log.initLog(c.logDir, Log.Verbose)
       new Starfire().execute()
     } getOrElse {
       println(parser.usage)

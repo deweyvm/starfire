@@ -6,11 +6,10 @@ import java.net.Socket
 import com.deweyvm.dogue.common.logging.Log
 import com.deweyvm.dogue.common.threading.Task
 
-class StarWorker(string:String, socket:Socket) extends Task {
+class StarWorker(string:String, reader:StarReader, socket:Socket) extends Task {
   override def execute() {
     (doCommand _ ∘ convert)(string)
   }
-
   private def doCommand(string:String) {
     val parts = string.esplit(' ')
     val command = parts(0)
@@ -20,6 +19,9 @@ class StarWorker(string:String, socket:Socket) extends Task {
     } else if (command == "/say") {
       Log.info("saying \"%s\" to all clients" format rest)
       socket.transmit(rest)
+    } else if (command == "/ping") {
+      reader.pong()
+      socket.transmit("/pong")
     }
   }
 
