@@ -3,7 +3,7 @@ package com.deweyvm.dogue.starfire
 import com.deweyvm.dogue.common.threading.Task
 import com.deweyvm.dogue.common.logging.Log
 
-class StarPong(reader:StarReader) extends Task {
+class StarPong(reader:StarConnection) extends Task {
   private var lastPong = System.currentTimeMillis()
   private val maxPingTimeMillis = 120*1000
 

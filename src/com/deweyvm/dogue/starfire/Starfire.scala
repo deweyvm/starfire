@@ -1,6 +1,6 @@
 package com.deweyvm.dogue.starfire
 
-import java.net.{SocketTimeoutException, ServerSocket}
+import java.net.{Socket, SocketTimeoutException, ServerSocket}
 import com.deweyvm.dogue.common.Implicits._
 import com.deweyvm.dogue.common.logging.Log
 import com.deweyvm.dogue.common.threading.Task
@@ -12,22 +12,22 @@ class Starfire(port:Int) {
   var running = true
   var readerId = 0
 
-  var readers = ArrayBuffer[StarReader]()
+  var readers = ArrayBuffer[StarConnection]()
   def execute() {
     Log.info("Starting server")
     val server = new ServerSocket(port)
     Log.info("Server started successfully")
     while(running && !server.isClosed) {
       Log.info("Awaiting connections")
-      val connection = server.accept()
+      val socket = server.accept()
       val (running, stopped) = readers partition { _.isRunning }
       readers = running
       stopped foreach { _.kill() }
       Log.info("Spawning reader")
-      val reader = new StarReader(connection, this, readerId)
+      val connection = new StarConnection(socket, this, readerId)
       readerId += 1
-      reader.start()
-      readers += reader
+      connection.start()
+      readers += connection
 
     }
     Log.info("Shutting down")
@@ -35,7 +35,7 @@ class Starfire(port:Int) {
 
   def broadcast(string:String) {
     readers foreach { r =>
-      r.
+      //r.
     }
   }
 

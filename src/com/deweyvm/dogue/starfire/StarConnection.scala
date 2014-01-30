@@ -7,7 +7,7 @@ import com.deweyvm.dogue.common.logging.Log
 import com.deweyvm.dogue.common.threading.{ThreadManager, Task}
 
 
-class StarReader(socket:Socket, parent:Starfire, id:Int) extends Task {
+class StarConnection(socket:Socket, parent:Starfire, id:Int) extends Task {
   private val inBuffer = ArrayBuffer[String]()
   private var current = ""
 
