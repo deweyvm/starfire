@@ -4,7 +4,7 @@ import java.net.Socket
 import scala.collection.mutable.ArrayBuffer
 import com.deweyvm.dogue.common.Implicits._
 import com.deweyvm.dogue.common.logging.Log
-import com.deweyvm.dogue.common.threading.Task
+import com.deweyvm.dogue.common.threading.{ThreadManager, Task}
 
 
 class StarReader(socket:Socket, parent:Starfire, id:Int) extends Task {
@@ -12,37 +12,46 @@ class StarReader(socket:Socket, parent:Starfire, id:Int) extends Task {
   private val inBuffer = ArrayBuffer[String]()
   private var current = ""
 
-  private val ponger = new StarPong(this)
-  ponger.start()
+  private val ponger = ThreadManager.spawn(new StarPong(this))
   def isRunning:Boolean = running
 
   def kill() {
     running = false
+    ponger.kill()
     Log.info("Attempting to kill reader thread")
   }
+
   socket.setSoTimeout(500)
   override def execute() {
-    while(running && !socket.isClosed) {
-      val read = socket.receive()
-      read foreach { next =>
-        Log.info("Got data: " + next)
-        val lines = next.esplit('\0')
-        val last = lines(lines.length - 1)
-        val first = lines.dropRight(1)
-        for (s <- first) {
-          current += s
-          inBuffer += current
-          current = ""
-        }
-        current = last
-
-        for (s <- inBuffer) {
-          new StarWorker(s, this, socket/*fixme should probably be a different socket?*/).start()
-        }
-        inBuffer.clear()
+    try {
+      while(running) {
+        run()
       }
+    } finally {
+      Log.info("Reader closed")
+      ponger.kill()
     }
-    Log.info("Reader closed")
+  }
+
+  private def run() {
+    val read = socket.receive()
+    read foreach { next =>
+      Log.info("Got data: " + next)
+      val lines = next.esplit('\0')
+      val last = lines(lines.length - 1)
+      val first = lines.dropRight(1)
+      for (s <- first) {
+        current += s
+        inBuffer += current
+        current = ""
+      }
+      current = last
+
+      for (s <- inBuffer) {
+        new StarWorker(s, this, socket/*fixme should probably be a different socket?*/).start()
+      }
+      inBuffer.clear()
+    }
   }
 
   def pong() {

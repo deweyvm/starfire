@@ -6,7 +6,12 @@ import com.deweyvm.dogue.common.logging.Log
 class StarPong(reader:StarReader) extends Task {
   private var running = true
   private var lastPong = System.currentTimeMillis()
-  private val maxPingTimeMillis = 30*1000
+  private val maxPingTimeMillis = 120*1000
+
+  def kill() {
+
+  }
+
   override def execute() {
     while(running) {
       Thread.sleep(250)

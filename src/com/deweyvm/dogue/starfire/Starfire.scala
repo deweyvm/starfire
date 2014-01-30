@@ -4,14 +4,15 @@ import java.net.{SocketTimeoutException, ServerSocket}
 import com.deweyvm.dogue.common.Implicits._
 import com.deweyvm.dogue.common.logging.Log
 import com.deweyvm.dogue.common.threading.Task
+import scala.collection.mutable.ArrayBuffer
 
 
 class Starfire {
   val port = 4815
   var running = true
   var readers = 0
-  //this doesnt scale to more than 1 concurrent connection
-  var currentReader:Option[StarReader] = None
+
+  val readers = ArrayBuffer[StarReader]()
   def execute() {
     Log.info("Starting server")
     val server = new ServerSocket(port)
@@ -19,10 +20,8 @@ class Starfire {
     while(running && !server.isClosed) {
       Log.info("Awaiting connections")
       val connection = server.accept()
-      currentReader foreach {
-        Log.info("Killing old reader")
-        _.kill()
-      }
+      val (running, stopped) = readers partition { _.isRunning }
+      stopped foreach { _.kill() }
       Log.info("Spawning reader")
       val reader = new StarReader(connection, this, readers)
       readers += 1
