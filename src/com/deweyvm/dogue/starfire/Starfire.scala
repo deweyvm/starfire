@@ -7,12 +7,12 @@ import com.deweyvm.dogue.common.threading.Task
 import scala.collection.mutable.ArrayBuffer
 
 
-class Starfire {
-  val port = 4815
-  var running = true
-  var readers = 0
+class Starfire(port:Int) {
 
-  val readers = ArrayBuffer[StarReader]()
+  var running = true
+  var readerId = 0
+
+  var readers = ArrayBuffer[StarReader]()
   def execute() {
     Log.info("Starting server")
     val server = new ServerSocket(port)
@@ -21,12 +21,13 @@ class Starfire {
       Log.info("Awaiting connections")
       val connection = server.accept()
       val (running, stopped) = readers partition { _.isRunning }
+      readers = running
       stopped foreach { _.kill() }
       Log.info("Spawning reader")
-      val reader = new StarReader(connection, this, readers)
-      readers += 1
+      val reader = new StarReader(connection, this, readerId)
+      readerId += 1
       reader.start()
-      currentReader = reader.some
+      readers += reader
 
     }
     Log.info("Shutting down")

@@ -7,9 +7,16 @@ import com.deweyvm.dogue.common.logging.Log
 import com.deweyvm.dogue.common.threading.Task
 
 class StarWorker(string:String, reader:StarReader, socket:Socket) extends Task {
-  override def execute() {
+
+  override def doWork() {
     (doCommand _ ∘ convert)(string)
+    kill()
   }
+
+  override def cleanup() {
+    Log.info("Worker is done")
+  }
+
   private def doCommand(string:String) {
     val parts = string.esplit(' ')
     val command = parts(0)

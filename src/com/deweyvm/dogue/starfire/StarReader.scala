@@ -8,32 +8,22 @@ import com.deweyvm.dogue.common.threading.{ThreadManager, Task}
 
 
 class StarReader(socket:Socket, parent:Starfire, id:Int) extends Task {
-  private var running = true
   private val inBuffer = ArrayBuffer[String]()
   private var current = ""
 
   private val ponger = ThreadManager.spawn(new StarPong(this))
-  def isRunning:Boolean = running
-
-  def kill() {
-    running = false
-    ponger.kill()
-    Log.info("Attempting to kill reader thread")
-  }
-
   socket.setSoTimeout(500)
-  override def execute() {
-    try {
-      while(running) {
-        run()
-      }
-    } finally {
-      Log.info("Reader closed")
-      ponger.kill()
-    }
+
+  override def killAux() {
+    ponger.kill()
   }
 
-  private def run() {
+  override def cleanup() {
+    Log.info("Reader closed")
+    ponger.kill()
+  }
+
+  override def doWork() {
     val read = socket.receive()
     read foreach { next =>
       Log.info("Got data: " + next)

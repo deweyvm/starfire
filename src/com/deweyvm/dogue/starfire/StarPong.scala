@@ -4,22 +4,21 @@ import com.deweyvm.dogue.common.threading.Task
 import com.deweyvm.dogue.common.logging.Log
 
 class StarPong(reader:StarReader) extends Task {
-  private var running = true
   private var lastPong = System.currentTimeMillis()
   private val maxPingTimeMillis = 120*1000
 
-  def kill() {
-
+  override def killAux() {
+    reader.kill()
   }
 
-  override def execute() {
-    while(running) {
-      Thread.sleep(250)
-      if (System.currentTimeMillis - lastPong > maxPingTimeMillis) {
-        reader.kill()
-        running = false
-      }
+  override def doWork() {
+    Thread.sleep(250)
+    if (System.currentTimeMillis - lastPong > maxPingTimeMillis) {
+      kill()
     }
+  }
+
+  override def cleanup() {
     Log.info("Ponger dying")
   }
 
