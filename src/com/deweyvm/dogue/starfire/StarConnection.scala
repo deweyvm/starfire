@@ -5,14 +5,15 @@ import scala.collection.mutable.ArrayBuffer
 import com.deweyvm.dogue.common.Implicits._
 import com.deweyvm.dogue.common.logging.Log
 import com.deweyvm.dogue.common.threading.{ThreadManager, Task}
+import com.deweyvm.dogue.common.io.DogueSocket
 
 
-class StarConnection(socket:Socket, parent:Starfire, id:Int) extends Task {
+class StarConnection(socket:DogueSocket, parent:Starfire, id:Int) extends Task {
   private val inBuffer = ArrayBuffer[String]()
   private var current = ""
 
   private val ponger = ThreadManager.spawn(new StarPong(this))
-  socket.setSoTimeout(500)
+  socket.setTimeout(500)
 
   override def killAux() {
     ponger.kill()
@@ -21,6 +22,10 @@ class StarConnection(socket:Socket, parent:Starfire, id:Int) extends Task {
   override def cleanup() {
     Log.info("Reader closed")
     ponger.kill()
+  }
+
+  def write(s:String) {
+    socket.transmit(s)
   }
 
   override def doWork() {
@@ -38,7 +43,7 @@ class StarConnection(socket:Socket, parent:Starfire, id:Int) extends Task {
       current = last
 
       for (s <- inBuffer) {
-        new StarWorker(s, this, socket/*fixme should probably be a different socket?*/).start()
+        new StarWorker(s, this, socket).start()
       }
       inBuffer.clear()
     }

@@ -5,8 +5,9 @@ import com.deweyvm.dogue.common.Functions._
 import java.net.Socket
 import com.deweyvm.dogue.common.logging.Log
 import com.deweyvm.dogue.common.threading.Task
+import com.deweyvm.dogue.common.io.DogueSocket
 
-class StarWorker(string:String, reader:StarConnection, socket:Socket) extends Task {
+class StarWorker(string:String, reader:StarConnection, socket:DogueSocket) extends Task {
 
   override def doWork() {
     (doCommand _ ∘ convert)(string)

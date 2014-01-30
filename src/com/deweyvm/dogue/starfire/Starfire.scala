@@ -5,6 +5,7 @@ import com.deweyvm.dogue.common.Implicits._
 import com.deweyvm.dogue.common.logging.Log
 import com.deweyvm.dogue.common.threading.Task
 import scala.collection.mutable.ArrayBuffer
+import com.deweyvm.dogue.common.io.DogueServer
 
 
 class Starfire(port:Int) {
@@ -15,9 +16,9 @@ class Starfire(port:Int) {
   var readers = ArrayBuffer[StarConnection]()
   def execute() {
     Log.info("Starting server")
-    val server = new ServerSocket(port)
+    val server = new DogueServer(port)
     Log.info("Server started successfully")
-    while(running && !server.isClosed) {
+    while(running) {
       Log.info("Awaiting connections")
       val socket = server.accept()
       val (running, stopped) = readers partition { _.isRunning }
