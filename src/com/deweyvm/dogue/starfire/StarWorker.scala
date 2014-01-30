@@ -14,7 +14,7 @@ class StarWorker(string:String, reader:StarReader, socket:Socket) extends Task {
   }
 
   override def cleanup() {
-    Log.info("Worker is done")
+    Log.verbose("Worker is done")
   }
 
   private def doCommand(string:String) {

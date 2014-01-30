@@ -42,6 +42,7 @@ class StarReader(socket:Socket, parent:Starfire, id:Int) extends Task {
       }
       inBuffer.clear()
     }
+    Thread.sleep(500)
   }
 
   def pong() {

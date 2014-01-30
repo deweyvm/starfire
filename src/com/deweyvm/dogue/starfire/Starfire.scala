@@ -33,5 +33,11 @@ class Starfire(port:Int) {
     Log.info("Shutting down")
   }
 
+  def broadcast(string:String) {
+    readers foreach { r =>
+      r.
+    }
+  }
+
 }
 
