@@ -19,7 +19,7 @@ class StarPonger(reader:StarConnection) extends Task {
   }
 
   override def cleanup() {
-    Log.info("Ponger dying")
+    Log.verbose("Ponger dying")
   }
 
   def pong() {

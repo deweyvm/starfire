@@ -20,7 +20,7 @@ class Starfire(val name:String, port:Int) {
     val server = new DogueServer("starfire", port)
     Log.info("Server started successfully")
     while(running) {
-      Log.info("Awaiting connections")
+      Log.info("Awaiting connections on port " + port)
       val socket = server.accept()
       val (running, stopped) = readers partition { _.isRunning }
       readers = running

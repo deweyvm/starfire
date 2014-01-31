@@ -28,8 +28,7 @@ class StarWorker(cmd:Command, connection:StarConnection, socket:DogueSocket) ext
     if (command.op == "quit") {
       Log.info("don't know how to quit :(")
     } else if (command.op == "say") {
-      connection.broadcast(command.args.mkString)
-      socket.transmit(Command("say", connection.getName, "SERVER", Vector()))
+      connection.broadcast(command.toSay)
     } else if (command.op == "ping") {
       connection.pong()
       socket.transmit(Command("pong", connection.getName, "SERVER", Vector()))
