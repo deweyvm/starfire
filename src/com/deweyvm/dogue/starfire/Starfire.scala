@@ -6,9 +6,10 @@ import com.deweyvm.dogue.common.logging.Log
 import com.deweyvm.dogue.common.threading.Task
 import scala.collection.mutable.ArrayBuffer
 import com.deweyvm.dogue.common.io.DogueServer
+import com.deweyvm.dogue.common.protocol.Command
 
 
-class Starfire(port:Int) {
+class Starfire(val name:String, port:Int) {
 
   var running = true
   var readerId = 0
@@ -36,7 +37,7 @@ class Starfire(port:Int) {
 
   def broadcast(string:String) {
     readers foreach { r =>
-      //r.
+      r.write(Command("say", "SERVER", "fixme", Vector(string)))
     }
   }
 

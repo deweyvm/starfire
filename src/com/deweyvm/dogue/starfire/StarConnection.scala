@@ -6,12 +6,11 @@ import com.deweyvm.dogue.common.Implicits._
 import com.deweyvm.dogue.common.logging.Log
 import com.deweyvm.dogue.common.threading.{ThreadManager, Task}
 import com.deweyvm.dogue.common.io.DogueSocket
+import com.deweyvm.dogue.common.protocol.{Invalid, Command, DogueMessage}
 
 
 class StarConnection(socket:DogueSocket, parent:Starfire, id:Int) extends Task {
-  private val inBuffer = ArrayBuffer[String]()
-  private var current = ""
-
+  def getName = parent.name
   private val ponger = ThreadManager.spawn(new StarPong(this))
   socket.setTimeout(500)
 
@@ -24,28 +23,18 @@ class StarConnection(socket:DogueSocket, parent:Starfire, id:Int) extends Task {
     ponger.kill()
   }
 
-  def write(s:String) {
+  def write(s:DogueMessage) {
     socket.transmit(s)
   }
 
   override def doWork() {
-    val read = socket.receive()
-    read foreach { next =>
-      Log.info("Got data: " + next)
-      val lines = next.esplit('\0')
-      val last = lines(lines.length - 1)
-      val first = lines.dropRight(1)
-      for (s <- first) {
-        current += s
-        inBuffer += current
-        current = ""
-      }
-      current = last
-
-      for (s <- inBuffer) {
-        new StarWorker(s, this, socket).start()
-      }
-      inBuffer.clear()
+    val commands = socket.receiveCommands()
+    commands foreach {
+      case Invalid(msg) =>
+        Log.warn("Invalid command: \"%s\"" format msg)
+      case cmd@Command(_,_,_,_) =>
+        Log.info("Got data: \"%s\"" format cmd.toString)
+        new StarWorker(cmd, this, socket).start()
     }
     Thread.sleep(500)
   }
@@ -54,6 +43,9 @@ class StarConnection(socket:DogueSocket, parent:Starfire, id:Int) extends Task {
     ponger.pong()
   }
 
+  def broadcast(string:String) {
+    parent.broadcast(string)
+  }
 
 }
 

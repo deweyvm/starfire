@@ -20,7 +20,7 @@ object Main {
     }
     parser.parse(args, StarfireOptions()) map { c =>
       Log.initLog(c.logDir, Log.Verbose)
-      new Starfire(c.port).execute()
+      new Starfire("flare", c.port).execute()
     } getOrElse {
       println(parser.usage)
       throw new RuntimeException("invalid args")
