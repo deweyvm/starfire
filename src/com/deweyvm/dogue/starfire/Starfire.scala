@@ -17,7 +17,7 @@ class Starfire(val name:String, port:Int) {
   var readers = ArrayBuffer[StarConnection]()
   def execute() {
     Log.info("Starting server")
-    val server = new DogueServer(port)
+    val server = new DogueServer("starfire", port)
     Log.info("Server started successfully")
     while(running) {
       Log.info("Awaiting connections")
