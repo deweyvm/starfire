@@ -30,10 +30,9 @@ class StarConnection(clientName:String, socket:DogueSocket, parent:Starfire, id:
   override def doWork() {
     val commands = socket.receiveCommands()
     commands foreach {
-      case Invalid(msg) =>
-        Log.warn("Invalid command: \"%s\"" format msg)
+      case Invalid(text) =>
+        Log.warn("Invalid command: \"%s\"" format text)
       case cmd@Command(_,_,_,_) =>
-        Log.info("Got data: \"%s\"" format cmd.toString)
         new StarWorker(cmd, this, socket).start()
     }
     Thread.sleep(500)
@@ -43,8 +42,8 @@ class StarConnection(clientName:String, socket:DogueSocket, parent:Starfire, id:
     ponger.pong()
   }
 
-  def broadcast(string:String) {
-    parent.broadcast(string)
+  def broadcast(from:String, string:String) {
+    parent.broadcast(from, string)
   }
 
 }

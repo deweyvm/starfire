@@ -21,17 +21,17 @@ class StarWorker(cmd:Command, connection:StarConnection, socket:DogueSocket) ext
   }
 
   override def cleanup() {
-    Log.verbose("Worker is done")
+    Log.all("Worker is done")
   }
 
   private def doCommand(command:Command) {
     if (command.op == "quit") {
       Log.info("don't know how to quit :(")
     } else if (command.op == "say") {
-      connection.broadcast(command.toSay)
+      connection.broadcast(command.source, command.toSay)
     } else if (command.op == "ping") {
       connection.pong()
-      socket.transmit(Command("pong", connection.getName, "SERVER", Vector()))
+      socket.transmit(Command("pong", connection.getName, command.dest, Vector()))
     }
   }
 }

@@ -28,7 +28,7 @@ class Starfire(val name:String, port:Int) {
         val (running, stopped) = readers partition { _.isRunning }
         readers = running
         stopped foreach { _.kill() }
-        Log.info("Spawning reader")
+        Log.all("Spawning reader")
         val connection = new StarConnection(clientName, socket, this, readerId)
         readerId += 1
         connection.start()
@@ -42,12 +42,12 @@ class Starfire(val name:String, port:Int) {
       }
 
     }
-    Log.info("Shutting down")
+    Log.all("Shutting down")
   }
 
-  def broadcast(string:String) {
+  def broadcast(from:String, string:String) {
     readers foreach { r =>
-      r.write(Command("say", "SERVER", "fixme", Vector(string)))
+      r.write(Command("say", from, r.getName, Vector(string)))
     }
   }
 
