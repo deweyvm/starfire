@@ -7,6 +7,7 @@ import com.deweyvm.dogue.common.threading.Task
 import scala.collection.mutable.ArrayBuffer
 import com.deweyvm.dogue.common.io.DogueServer
 import com.deweyvm.dogue.common.protocol.Command
+import com.deweyvm.dogue.starfire.db.DbConnection
 
 
 class Starfire(val name:String, port:Int) {
@@ -16,6 +17,7 @@ class Starfire(val name:String, port:Int) {
 
   var readers = ArrayBuffer[StarConnection]()
   def execute() {
+    new DbConnection
     Log.info("Starting server")
     val server = new DogueServer("starfire", port)
     Log.info("Server started successfully")
@@ -30,7 +32,6 @@ class Starfire(val name:String, port:Int) {
       readerId += 1
       connection.start()
       readers += connection
-
     }
     Log.info("Shutting down")
   }
