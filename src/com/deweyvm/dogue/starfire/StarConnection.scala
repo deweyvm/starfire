@@ -9,7 +9,7 @@ import com.deweyvm.dogue.common.io.DogueSocket
 import com.deweyvm.dogue.common.protocol.{Invalid, Command, DogueMessage}
 
 
-class StarConnection(socket:DogueSocket, parent:Starfire, id:Int) extends Task {
+class StarConnection(clientName:String, socket:DogueSocket, parent:Starfire, id:Int) extends Task {
   def getName = parent.name
   private val ponger = ThreadManager.spawn(new StarPonger(this))
   socket.setTimeout(500)

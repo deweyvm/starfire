@@ -24,14 +24,23 @@ class Starfire(val name:String, port:Int) {
     while(running) {
       Log.info("Awaiting connections on port " + port)
       val socket = server.accept()
-      val (running, stopped) = readers partition { _.isRunning }
-      readers = running
-      stopped foreach { _.kill() }
-      Log.info("Spawning reader")
-      val connection = new StarConnection(socket, this, readerId)
-      readerId += 1
-      connection.start()
-      readers += connection
+      def onComplete(clientName:String) {
+        val (running, stopped) = readers partition { _.isRunning }
+        readers = running
+        stopped foreach { _.kill() }
+        Log.info("Spawning reader")
+        val connection = new StarConnection(clientName, socket, this, readerId)
+        readerId += 1
+        connection.start()
+        readers += connection
+      }
+      try {
+        new StarHandshake(name, socket, onComplete).start()
+      } catch {
+        case hst:HandshakeTimeout =>
+        Log.warn("Handshake timeout")
+      }
+
     }
     Log.info("Shutting down")
   }
