@@ -9,12 +9,7 @@ import com.deweyvm.dogue.common.io.DogueSocket
 import com.deweyvm.dogue.common.protocol.{DogueOp, Command}
 import com.deweyvm.dogue.common.parsing.CommandParser
 
-object StarWorker {
-  val parser = new CommandParser
-
-}
 class StarWorker(cmd:Command, connection:StarConnection, socket:DogueSocket) extends Task {
-  import StarWorker._
   override def doWork() {
     doCommand(cmd)
     kill()
@@ -25,13 +20,18 @@ class StarWorker(cmd:Command, connection:StarConnection, socket:DogueSocket) ext
   }
 
   private def doCommand(command:Command) {
-    if (command.op == DogueOp.Quit) {
-      Log.info("don't know how to quit :(")
-    } else if (command.op == DogueOp.Say) {
-      connection.broadcast(command.source, command.args(0))//fixme issue #79
-    } else if (command.op == DogueOp.Ping) {
-      connection.pong()
-      socket.transmit(Command(DogueOp.Pong, connection.getName, command.source, Vector()))
+    import DogueOp._
+    command.op match {
+      case Quit =>
+        Log.info("Close requested by " + command.source)
+        connection.close()
+      case Say =>
+        connection.broadcast(command.source, command.args(0))//fixme issue #79
+      case Ping =>
+        connection.pong()
+        socket.transmit(Command(DogueOp.Pong, connection.getName, command.source, Vector()))
+      case _ =>
+        Log.warn("Command \"%s\" unhandled in server." format command)
     }
   }
 }

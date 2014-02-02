@@ -4,6 +4,7 @@ import com.deweyvm.dogue.common.io.DogueSocket
 import com.deweyvm.dogue.common.threading.Task
 import com.deweyvm.dogue.common.protocol.{DogueOp, Invalid, Command}
 import com.deweyvm.dogue.common.logging.Log
+import com.badlogic.gdx.Gdx
 
 trait StarHandshakeState
 
@@ -20,7 +21,7 @@ class StarHandshake(serverName:String, socket:DogueSocket, acceptAction:(String)
   private var iterations = 10
 
   override def init() {
-    Log.info("Beginning handshake")
+    Log.all("Beginning handshake")
   }
 
   override def doWork() {
@@ -34,7 +35,7 @@ class StarHandshake(serverName:String, socket:DogueSocket, acceptAction:(String)
           case cmd@Command(op, src, dst, args) =>
             val clientName = src
             if (op == DogueOp.Greet) {
-              Log.info("Received greeting from " + clientName)
+              Log.all("Received greeting from " + clientName)
               socket.transmit(new Command(DogueOp.Greet, serverName, clientName, "Welcome!"))
               kill()
               acceptAction(clientName)
@@ -53,7 +54,7 @@ class StarHandshake(serverName:String, socket:DogueSocket, acceptAction:(String)
   }
 
   override def cleanup() {
-    Log.verbose("Handshake dying")
+    Log.all("Handshake dying")
   }
 
 }

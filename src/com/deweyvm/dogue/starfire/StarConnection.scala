@@ -9,7 +9,7 @@ import com.deweyvm.dogue.common.io.DogueSocket
 import com.deweyvm.dogue.common.protocol.{Invalid, Command, DogueMessage}
 
 
-class StarConnection(clientName:String, socket:DogueSocket, parent:Starfire, id:Int) extends Task {
+class StarConnection(val clientName:String, socket:DogueSocket, parent:Starfire, id:Int) extends Task {
   def getName = parent.name
   private val ponger = ThreadManager.spawn(new StarPonger(this))
   socket.setTimeout(500)
@@ -19,7 +19,7 @@ class StarConnection(clientName:String, socket:DogueSocket, parent:Starfire, id:
   }
 
   override def cleanup() {
-    Log.info("Reader closed")
+    Log.info("Connection to \"%s\" closed" format clientName)
     ponger.kill()
   }
 
@@ -45,6 +45,11 @@ class StarConnection(clientName:String, socket:DogueSocket, parent:Starfire, id:
   def broadcast(from:String, string:String) {
     parent.broadcast(from, string)
   }
+
+  def close() {
+    kill()
+  }
+
 
 }
 

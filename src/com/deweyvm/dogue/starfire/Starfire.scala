@@ -47,7 +47,7 @@ class Starfire(val name:String, port:Int) {
 
   def broadcast(from:String, string:String) {
     readers foreach { r =>
-      r.write(Command(DogueOp.Say, from, r.getName, Vector(string)))
+      r.write(Command(DogueOp.Say, from, r.clientName, Vector(string)))
     }
   }
 
