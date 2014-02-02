@@ -24,8 +24,6 @@ class StarWorker(cmd:Command, connection:StarConnection, socket:DogueSocket) ext
     command.op match {
       case Quit =>
         Log.info("Close requested by " + command.source)
-
-
         connection.close()
       case Say =>
         connection.broadcast(command.source, command.args(0))//fixme issue #86

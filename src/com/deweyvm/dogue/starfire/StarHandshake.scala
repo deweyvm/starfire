@@ -29,18 +29,24 @@ class StarHandshake(serverName:String, socket:DogueSocket, acceptAction:(String)
       case Greet =>
         socket.transmit(new Command(DogueOp.Greet, serverName, "&unknown&", "identify"))
         state = WaitReply
+        Thread.sleep(5000)
       case WaitReply =>
+        Log.info("Waiting for reply")
         val commands = socket.receiveCommands()
         commands foreach {
           case cmd@Command(op, src, dst, args) =>
             val clientName = src
-            if (op == DogueOp.Greet) {
-              Log.all("Received greeting from " + clientName)
-              socket.transmit(new Command(DogueOp.Greet, serverName, clientName, "Welcome!"))
-              kill()
-              acceptAction(clientName)
-            } else {
-              Log.warn("Command \"%s\" ignored during handshake." format cmd.toString)
+            op match {
+              case DogueOp.Greet =>
+                Log.all("Received greeting from " + clientName)
+                socket.transmit(new Command(DogueOp.Greet, serverName, clientName, "Welcome!"))
+                kill()
+                acceptAction(clientName)
+              case DogueOp.Quit =>
+                Log.info("Handshake interrupted: client closed connection")
+                kill()
+              case _ =>
+                Log.warn("Command \"%s\" ignored during handshake." format cmd.toString)
             }
           case inv@Invalid(_,_) =>
             inv.warn()
