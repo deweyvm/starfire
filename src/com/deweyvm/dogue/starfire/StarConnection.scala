@@ -30,8 +30,8 @@ class StarConnection(clientName:String, socket:DogueSocket, parent:Starfire, id:
   override def doWork() {
     val commands = socket.receiveCommands()
     commands foreach {
-      case Invalid(text) =>
-        Log.warn("Invalid command: \"%s\"" format text)
+      case inv@Invalid(_,_) =>
+        inv.warn()
       case cmd@Command(_,_,_,_) =>
         new StarWorker(cmd, this, socket).start()
     }
