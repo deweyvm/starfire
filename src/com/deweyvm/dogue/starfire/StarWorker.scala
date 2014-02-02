@@ -28,7 +28,8 @@ class StarWorker(cmd:Command, connection:StarConnection, socket:DogueSocket) ext
 
         connection.close()
       case Say =>
-        connection.broadcast(command.source, command.args.mkString(" "))//fixme issue #86
+        Log.info("Args:" + command.args.toString)
+        connection.broadcast(command.source, command.args(0))//fixme issue #86
       case Ping =>
         connection.pong()
         socket.transmit(Command(DogueOp.Pong, connection.getName, command.source, Vector()))
