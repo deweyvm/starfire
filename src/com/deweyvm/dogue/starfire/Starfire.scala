@@ -6,7 +6,7 @@ import com.deweyvm.dogue.common.logging.Log
 import com.deweyvm.dogue.common.threading.Task
 import scala.collection.mutable.ArrayBuffer
 import com.deweyvm.dogue.common.io.DogueServer
-import com.deweyvm.dogue.common.protocol.{DogueOp, Command}
+import com.deweyvm.dogue.common.protocol.{DogueOps, Command}
 import com.deweyvm.dogue.starfire.db.DbConnection
 
 
@@ -17,7 +17,6 @@ class Starfire(val name:String, port:Int) {
 
   var readers = ArrayBuffer[StarConnection]()
   def execute() {
-    new DbConnection
     Log.info("Starting server")
     val server = new DogueServer(name, port)
     Log.info("Server started successfully")
@@ -48,8 +47,12 @@ class Starfire(val name:String, port:Int) {
 
   def broadcast(from:String, string:String) {
     readers foreach { r =>
-      r.write(Command(DogueOp.Say, from, r.clientName, Vector(string)))
+      r.write(Command(DogueOps.Say, from, r.clientName, Vector(string)))
     }
+  }
+
+  def nickInUse(name:String):Boolean = {
+    readers exists {r => r.clientName == name}
   }
 
 }

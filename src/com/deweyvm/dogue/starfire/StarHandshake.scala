@@ -2,7 +2,7 @@ package com.deweyvm.dogue.starfire
 
 import com.deweyvm.dogue.common.io.DogueSocket
 import com.deweyvm.dogue.common.threading.Task
-import com.deweyvm.dogue.common.protocol.{DogueOp, Invalid, Command}
+import com.deweyvm.dogue.common.protocol.{DogueOps, Invalid, Command}
 import com.deweyvm.dogue.common.logging.Log
 import com.badlogic.gdx.Gdx
 
@@ -27,9 +27,8 @@ class StarHandshake(serverName:String, socket:DogueSocket, acceptAction:(String)
   override def doWork() {
     state match {
       case Greet =>
-        socket.transmit(new Command(DogueOp.Greet, serverName, "&unknown&", "identify"))
+        socket.transmit(new Command(DogueOps.Greet, serverName, "&unknown&", "identify"))
         state = WaitReply
-        Thread.sleep(5000)
       case WaitReply =>
         Log.info("Waiting for reply")
         val commands = socket.receiveCommands()
@@ -37,12 +36,12 @@ class StarHandshake(serverName:String, socket:DogueSocket, acceptAction:(String)
           case cmd@Command(op, src, dst, args) =>
             val clientName = src
             op match {
-              case DogueOp.Greet =>
+              case DogueOps.Greet =>
                 Log.all("Received greeting from " + clientName)
-                socket.transmit(new Command(DogueOp.Greet, serverName, clientName, "Welcome!"))
+                socket.transmit(new Command(DogueOps.Greet, serverName, clientName, "Welcome!"))
                 kill()
                 acceptAction(clientName)
-              case DogueOp.Quit =>
+              case DogueOps.Quit =>
                 Log.info("Handshake interrupted: client closed connection")
                 kill()
               case _ =>

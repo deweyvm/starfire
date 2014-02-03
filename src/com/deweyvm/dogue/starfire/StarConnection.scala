@@ -1,8 +1,5 @@
 package com.deweyvm.dogue.starfire
 
-import java.net.Socket
-import scala.collection.mutable.ArrayBuffer
-import com.deweyvm.dogue.common.Implicits._
 import com.deweyvm.dogue.common.logging.Log
 import com.deweyvm.dogue.common.threading.{ThreadManager, Task}
 import com.deweyvm.dogue.common.io.DogueSocket
@@ -10,7 +7,7 @@ import com.deweyvm.dogue.common.protocol.{Invalid, Command, DogueMessage}
 
 
 class StarConnection(val clientName:String, socket:DogueSocket, parent:Starfire, id:Int) extends Task {
-  def getName = parent.name
+  def serverName = parent.name
   private val ponger = ThreadManager.spawn(new StarPonger(this))
   socket.setTimeout(500)
 
@@ -44,6 +41,10 @@ class StarConnection(val clientName:String, socket:DogueSocket, parent:Starfire,
 
   def broadcast(from:String, string:String) {
     parent.broadcast(from, string)
+  }
+
+  def nickInUse(name:String):Boolean = {
+    parent.nickInUse(name)
   }
 
   def close() {

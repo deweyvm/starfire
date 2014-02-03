@@ -6,8 +6,11 @@ import java.net.Socket
 import com.deweyvm.dogue.common.logging.Log
 import com.deweyvm.dogue.common.threading.Task
 import com.deweyvm.dogue.common.io.DogueSocket
-import com.deweyvm.dogue.common.protocol.{DogueOp, Command}
+import com.deweyvm.dogue.common.protocol.{DogueOps, Command}
 import com.deweyvm.dogue.common.parsing.CommandParser
+import com.deweyvm.dogue.common.data.{Crypto, Encoding, GenUtils}
+import java.security.{MessageDigest, SecureRandom}
+import com.deweyvm.dogue.starfire.db.DbConnection
 
 class StarWorker(cmd:Command, connection:StarConnection, socket:DogueSocket) extends Task {
   override def doWork() {
@@ -20,7 +23,7 @@ class StarWorker(cmd:Command, connection:StarConnection, socket:DogueSocket) ext
   }
 
   private def doCommand(command:Command) {
-    import DogueOp._
+    import DogueOps._
     command.op match {
       case Quit =>
         Log.info("Close requested by " + command.source)
@@ -29,9 +32,19 @@ class StarWorker(cmd:Command, connection:StarConnection, socket:DogueSocket) ext
         connection.broadcast(command.source, command.args(0))//fixme issue #86
       case Ping =>
         connection.pong()
-        socket.transmit(Command(DogueOp.Pong, connection.getName, command.source, Vector()))
+        socket.transmit(Command(DogueOps.Pong, connection.serverName, command.source, Vector()))
+      case Nick =>
+        val newNick = command.args(0)
+        if (!connection.nickInUse(newNick)) {
+          val (password, salt, hash) = Crypto.generatePassword
+          Log.info(hash)
+          Log.info(salt)
+          new DbConnection().setPassword(newNick, salt, hash)
+          socket.transmit(Command(DogueOps.Reassign, connection.serverName, command.source, Vector(newNick, password)))
+        }
       case _ =>
         Log.warn("Command \"%s\" unhandled in server." format command)
     }
   }
+
 }
