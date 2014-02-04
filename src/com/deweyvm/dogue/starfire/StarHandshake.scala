@@ -51,7 +51,8 @@ object StarHandshake {
       val newName = new Name().get
       socket.transmit(new Command(DogueOps.Greet, serverName, clientName, reason))
       socket.transmit(new Command(DogueOps.Reassign, serverName, newName, reason))
-      socket.transmit(new Command(DogueOps.Greet, serverName, newName, "Handshake complete."))
+      socket.transmit(new Command(DogueOps.Greet, serverName, newName, "Naming you %s instead" format newName))
+      socket.transmit(new Command(DogueOps.Greet, serverName, newName, "Welcome!"))
       success(newName)
       kill()
     }
@@ -94,14 +95,10 @@ object StarHandshake {
                     success(username)
                     kill()
                   } else {
-                    socket.transmit(new Command(DogueOps.Greet, serverName, username, "Incorrect password."))
-
                     identFail("Password for user \"%s\" was incorrect" format username, username)
                   }
                 case None =>
-                  socket.transmit(new Command(DogueOps.Greet, serverName, username, "User not found or database connection could not be established."))
-
-                  identFail("User \"%s\" does not exist" format username, username)
+                  identFail("User not found or database connection could not be established.", username)
               }
 
             case DogueOps.Close =>
