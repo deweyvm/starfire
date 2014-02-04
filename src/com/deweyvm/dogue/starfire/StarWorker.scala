@@ -11,6 +11,7 @@ import com.deweyvm.dogue.common.parsing.CommandParser
 import com.deweyvm.dogue.common.data.{Crypto, Encoding, GenUtils}
 import java.security.{MessageDigest, SecureRandom}
 import com.deweyvm.dogue.starfire.db.DbConnection
+import com.deweyvm.dogue.common.procgen.Name
 
 class StarWorker(cmd:Command, connection:StarConnection, socket:DogueSocket) extends Task {
   override def doWork() {
@@ -25,7 +26,7 @@ class StarWorker(cmd:Command, connection:StarConnection, socket:DogueSocket) ext
   private def doCommand(command:Command) {
     import DogueOps._
     command.op match {
-      case Quit =>
+      case Close =>
         Log.info("Close requested by " + command.source)
         connection.close()
       case Say =>
@@ -33,6 +34,7 @@ class StarWorker(cmd:Command, connection:StarConnection, socket:DogueSocket) ext
       case Ping =>
         connection.pong()
         socket.transmit(Command(DogueOps.Pong, connection.serverName, command.source, Vector()))
+
       case Nick =>
         val newNick = command.args(0)
         if (!connection.nickInUse(newNick)) {
@@ -40,8 +42,22 @@ class StarWorker(cmd:Command, connection:StarConnection, socket:DogueSocket) ext
           Log.info(hash)
           Log.info(salt)
           new DbConnection().setPassword(newNick, salt, hash)
-          socket.transmit(Command(DogueOps.Reassign, connection.serverName, command.source, Vector(newNick, password)))
+          socket.transmit(Command(DogueOps.Assign, connection.serverName, command.source, Vector(newNick, password)))
         }
+      //this doesnt belong here
+      /*case Identify =>
+        val nick = command.args(0)
+        val password = command.args(1)
+        val o = new DbConnection().getPassword(nick)
+        o foreach { case (salt, hash) =>
+
+        }
+        if (o.isDefined && !connection.nickInUse(nick) && Crypto.comparePassword(password, "", "")) {
+          socket.transmit(new Command(DogueOps.Greet, connection.serverName, nick, "You are identified as " + nick))
+        } else {
+          socket.transmit(Command(DogueOps.Reassign, connection.serverName, new Name().get, Vector(new Name().get, "reason goes here fixme"/*#103*/)))
+        }
+        ()*/
       case _ =>
         Log.warn("Command \"%s\" unhandled in server." format command)
     }

@@ -5,7 +5,7 @@ import com.deweyvm.dogue.common.Implicits._
 import com.deweyvm.dogue.common.logging.Log
 import com.deweyvm.dogue.common.threading.Task
 import scala.collection.mutable.ArrayBuffer
-import com.deweyvm.dogue.common.io.DogueServer
+import com.deweyvm.dogue.common.io.{DogueSocket, DogueServer}
 import com.deweyvm.dogue.common.protocol.{DogueOps, Command}
 import com.deweyvm.dogue.starfire.db.DbConnection
 
@@ -34,12 +34,12 @@ class Starfire(val name:String, port:Int) {
         connection.start()
         readers += connection
       }
-      try {
-        new StarHandshake(name, socket, onComplete).start()
-      } catch {
-        case hst:HandshakeTimeout =>
-          Log.warn("Handshake timeout")
+
+      def onFailure(socket:DogueSocket) {
+        socket.transmit(new Command(DogueOps.Close, name, "&unknown&"))
+        socket.close()
       }
+      StarHandshake.begin(name, socket, onComplete, onFailure)
 
     }
     Log.all("Shutting down")

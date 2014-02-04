@@ -5,61 +5,110 @@ import com.deweyvm.dogue.common.threading.Task
 import com.deweyvm.dogue.common.protocol.{DogueOps, Invalid, Command}
 import com.deweyvm.dogue.common.logging.Log
 import com.badlogic.gdx.Gdx
+import com.deweyvm.dogue.common.data.Crypto
+import com.deweyvm.dogue.starfire.db.DbConnection
+import com.deweyvm.dogue.common.procgen.Name
 
-trait StarHandshakeState
-
-object StarHandshake {
-  case object Greet extends StarHandshakeState
-  case object WaitReply extends StarHandshakeState
-}
-
+//trait StarHandshakeState
+//
+//object StarHandshake {
+//  case object Greet extends StarHandshakeState
+//  case object WaitReply extends StarHandshakeState
+//}
 class HandshakeTimeout extends Exception
 
-class StarHandshake(serverName:String, socket:DogueSocket, acceptAction:(String) => Unit) extends Task {
-  import StarHandshake._
-  private var state:StarHandshakeState = Greet
-  private var iterations = 10
-
-  override def init() {
-    Log.all("Beginning handshake")
+object StarHandshake {
+  type SuccessCallback = String => Unit
+  type FailureCallback = DogueSocket => Unit
+  type Spawner = Task => Unit
+  def begin(serverName:String, socket:DogueSocket, success:SuccessCallback, failure:FailureCallback) {
+    val spawner = (a:Task) => {
+      a.start()
+      Log.info("Spawning in thread " + Thread.currentThread().getId)
+    }
+    spawner(new Greeting(serverName, socket, spawner, success, failure))
   }
 
-  override def doWork() {
-    state match {
-      case Greet =>
-        socket.transmit(new Command(DogueOps.Greet, serverName, "&unknown&", "identify"))
-        state = WaitReply
-      case WaitReply =>
-        Log.info("Waiting for reply")
-        val commands = socket.receiveCommands()
-        commands foreach {
-          case cmd@Command(op, src, dst, args) =>
-            val clientName = src
-            op match {
-              case DogueOps.Greet =>
-                Log.all("Received greeting from " + clientName)
-                socket.transmit(new Command(DogueOps.Greet, serverName, clientName, "Welcome!"))
-                kill()
-                acceptAction(clientName)
-              case DogueOps.Quit =>
-                Log.info("Handshake interrupted: client closed connection")
-                kill()
-              case _ =>
-                Log.warn("Command \"%s\" ignored during handshake." format cmd.toString)
-            }
-          case inv@Invalid(_,_) =>
-            inv.warn()
-        }
+  class Greeting(serverName:String, socket:DogueSocket, spawner:Spawner, success:SuccessCallback, failure:FailureCallback) extends Task {
+    override def doWork() {
+      Log.info("Greeting client")
+      socket.transmit(new Command(DogueOps.Greet, serverName, "&unknown&", "identify"))
+      kill()
+      spawner(new Identify(serverName, socket, success, failure))
     }
-    Thread.sleep(500)
-    iterations -= 1
-    if (iterations <= 0) {
-      throw new RuntimeException("Handshake timeout")
+
+    override def exception(t:Throwable) {
+      failure(socket)
     }
   }
 
-  override def cleanup() {
-    Log.all("Handshake dying")
+
+  class Identify(serverName:String, socket:DogueSocket, success:SuccessCallback, failure:FailureCallback) extends Task {
+    private var iters = 10
+
+    private def identFail(reason:String, clientName:String) {
+      Log.info("Identification failed: " + reason)
+      val newName = new Name().get
+      socket.transmit(new Command(DogueOps.Greet, serverName, clientName, reason))
+      socket.transmit(new Command(DogueOps.Reassign, serverName, newName, reason))
+      socket.transmit(new Command(DogueOps.Greet, serverName, newName, "Handshake complete."))
+      success(newName)
+      kill()
+    }
+
+    private def handshakeFail(reason:String, socket:DogueSocket) {
+      Log.warn("Handshake failure: " + reason)
+      failure(socket)
+      kill()
+    }
+
+    override def exception(t:Throwable) {
+      failure(socket)
+    }
+
+    override def doWork() {
+
+
+      socket.receiveCommands() foreach {
+        case cmd@Command(op, src, dst, args) =>
+          op match {
+            case DogueOps.Greet =>
+              Log.info("User not registered. Sending greeting...")
+              socket.transmit(new Command(DogueOps.Greet, serverName, src, "Handshake complete."))
+              success(src)
+              kill()
+            case DogueOps.Identify =>
+              Log.info("Attempting to authenticate user")
+              val username = args(0)
+              val password = args(1)
+              val dbd = new DbConnection().getPassword(username)
+              dbd match {
+                case Some((salt, hash)) =>
+                  if (Crypto.comparePassword(password, salt, hash)) {
+                    socket.transmit(new Command(DogueOps.Greet, serverName, username, "Now identified as %s" format username))
+                    success(username)
+                    kill()
+                  } else {
+                    identFail("Password for user \"%s\" was incorrect" format username, username)
+                  }
+                case None =>
+                  identFail("User \"%s\" does not exist" format username, username)
+              }
+
+            case DogueOps.Close =>
+              handshakeFail("Client closed connection", socket)
+          }
+
+      }
+      Thread.sleep(500)
+      iters -= 1
+      if (iters <= 0) {
+        handshakeFail("Timeout", socket)
+      }
+    }
+
   }
+
 
 }
+

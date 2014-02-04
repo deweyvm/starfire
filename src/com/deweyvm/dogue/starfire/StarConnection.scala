@@ -26,12 +26,7 @@ class StarConnection(val clientName:String, socket:DogueSocket, parent:Starfire,
 
   override def doWork() {
     val commands = socket.receiveCommands()
-    commands foreach {
-      case inv@Invalid(_,_) =>
-        inv.warn()
-      case cmd@Command(_,_,_,_) =>
-        new StarWorker(cmd, this, socket).start()
-    }
+    commands foreach { new StarWorker(_, this, socket).start() }
     Thread.sleep(500)
   }
 
