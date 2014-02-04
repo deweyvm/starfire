@@ -74,7 +74,9 @@ object StarHandshake {
           op match {
             case DogueOps.Greet =>
               Log.info("User not registered. Sending greeting...")
-              socket.transmit(new Command(DogueOps.Greet, serverName, src, "Handshake complete."))
+              socket.transmit(new Command(DogueOps.Greet, serverName, src, "Welcome!"))
+              socket.transmit(new Command(DogueOps.Greet, serverName, src, "You are called " + src))
+
               success(src)
               kill()
             case DogueOps.Identify =>
@@ -84,14 +86,21 @@ object StarHandshake {
               val dbd = new DbConnection().getPassword(username)
               dbd match {
                 case Some((salt, hash)) =>
+                  socket.transmit(new Command(DogueOps.Greet, serverName, username, "Looking up username..."))
                   if (Crypto.comparePassword(password, salt, hash)) {
-                    socket.transmit(new Command(DogueOps.Greet, serverName, username, "Now identified as %s" format username))
+
+                    socket.transmit(new Command(DogueOps.Greet, serverName, username, "Now identified as %s." format username))
+                    socket.transmit(new Command(DogueOps.Greet, serverName, username, "Welcome!"))
                     success(username)
                     kill()
                   } else {
+                    socket.transmit(new Command(DogueOps.Greet, serverName, username, "Incorrect password."))
+
                     identFail("Password for user \"%s\" was incorrect" format username, username)
                   }
                 case None =>
+                  socket.transmit(new Command(DogueOps.Greet, serverName, username, "User not found or database connection could not be established."))
+
                   identFail("User \"%s\" does not exist" format username, username)
               }
 
