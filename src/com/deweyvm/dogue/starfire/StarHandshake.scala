@@ -20,21 +20,16 @@ class HandshakeTimeout extends Exception
 object StarHandshake {
   type SuccessCallback = String => Unit
   type FailureCallback = DogueSocket => Unit
-  type Spawner = Task => Unit
   def begin(serverName:String, socket:DogueSocket, success:SuccessCallback, failure:FailureCallback) {
-    val spawner = (a:Task) => {
-      a.start()
-      Log.info("Spawning in thread " + Thread.currentThread().getId)
-    }
-    spawner(new Greeting(serverName, socket, spawner, success, failure))
+    new Greeting(serverName, socket, success, failure).start()
   }
 
-  class Greeting(serverName:String, socket:DogueSocket, spawner:Spawner, success:SuccessCallback, failure:FailureCallback) extends Task {
+  class Greeting(serverName:String, socket:DogueSocket, success:SuccessCallback, failure:FailureCallback) extends Task {
     override def doWork() {
       Log.info("Greeting client")
       socket.transmit(new Command(DogueOps.Greet, serverName, "&unknown&", "identify"))
       kill()
-      spawner(new Identify(serverName, socket, success, failure))
+      new Identify(serverName, socket, success, failure).start()
     }
 
     override def exception(t:Throwable) {
@@ -68,8 +63,6 @@ object StarHandshake {
     }
 
     override def doWork() {
-
-
       socket.receiveCommands() foreach {
         case cmd@Command(op, src, dst, args) =>
           op match {
