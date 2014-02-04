@@ -8,6 +8,7 @@ import scala.collection.mutable.ArrayBuffer
 import com.deweyvm.dogue.common.io.{DogueSocket, DogueServer}
 import com.deweyvm.dogue.common.protocol.{DogueOps, Command}
 import com.deweyvm.dogue.starfire.db.DbConnection
+import com.deweyvm.dogue.common.procgen.Name
 
 
 class Starfire(val name:String, port:Int) {
@@ -36,7 +37,7 @@ class Starfire(val name:String, port:Int) {
       }
 
       def onFailure(socket:DogueSocket) {
-        socket.transmit(new Command(DogueOps.Close, name, "&unknown&"))
+        socket.transmit(new Command(DogueOps.Close, name, Name.unknown))
         socket.close()
       }
       StarHandshake.begin(name, socket, onComplete, onFailure)

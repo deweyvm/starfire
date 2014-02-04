@@ -27,7 +27,7 @@ object StarHandshake {
   class Greeting(serverName:String, socket:DogueSocket, success:SuccessCallback, failure:FailureCallback) extends Task {
     override def doWork() {
       Log.info("Greeting client")
-      socket.transmit(new Command(DogueOps.Greet, serverName, "&unknown&", "identify"))
+      socket.transmit(new Command(DogueOps.Greet, serverName, Name.unknown, "identify"))
       kill()
       new Identify(serverName, socket, success, failure).start()
     }
@@ -76,7 +76,7 @@ object StarHandshake {
             case DogueOps.Identify =>
               Log.info("Attempting to authenticate user")
               if (args.length < 2) {
-                identFail("Blank password and/or username given", "&unknown&")
+                identFail("Blank password and/or username given", Name.unknown)
                 return
               }
               val username = args(0)
