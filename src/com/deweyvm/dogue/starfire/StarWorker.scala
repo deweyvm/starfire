@@ -44,20 +44,6 @@ class StarWorker(cmd:Command, connection:StarConnection, socket:DogueSocket) ext
           new DbConnection().setPassword(newNick, salt, hash)
           socket.transmit(Command(DogueOps.Assign, connection.serverName, command.source, Vector(newNick, password)))
         }
-      //this doesnt belong here
-      /*case Identify =>
-        val nick = command.args(0)
-        val password = command.args(1)
-        val o = new DbConnection().getPassword(nick)
-        o foreach { case (salt, hash) =>
-
-        }
-        if (o.isDefined && !connection.nickInUse(nick) && Crypto.comparePassword(password, "", "")) {
-          socket.transmit(new Command(DogueOps.Greet, connection.serverName, nick, "You are identified as " + nick))
-        } else {
-          socket.transmit(Command(DogueOps.Reassign, connection.serverName, new Name().get, Vector(new Name().get, "reason goes here fixme"/*#103*/)))
-        }
-        ()*/
       case _ =>
         Log.warn("Command \"%s\" unhandled in server." format command)
     }
