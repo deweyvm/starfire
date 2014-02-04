@@ -75,6 +75,10 @@ object StarHandshake {
               kill()
             case DogueOps.Identify =>
               Log.info("Attempting to authenticate user")
+              if (args.length < 2) {
+                identFail("Blank password and/or username given", "&unknown&")
+                return
+              }
               val username = args(0)
               val password = args(1)
               val dbd = new DbConnection().getPassword(username)
@@ -82,7 +86,6 @@ object StarHandshake {
                 case Some((salt, hash)) =>
                   socket.transmit(new Command(DogueOps.Greet, serverName, username, "Looking up username..."))
                   if (Crypto.comparePassword(password, salt, hash)) {
-
                     socket.transmit(new Command(DogueOps.Greet, serverName, username, "Now identified as %s." format username))
                     socket.transmit(new Command(DogueOps.Greet, serverName, username, "Welcome!"))
                     success(username)
