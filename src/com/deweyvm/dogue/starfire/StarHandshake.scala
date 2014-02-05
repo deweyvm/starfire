@@ -83,17 +83,19 @@ object StarHandshake {
               val password = args(1)
               val dbd = new DbConnection().getPassword(username)
               dbd match {
-                case Some((salt, hash)) =>
+                case Right((salt, hash)) =>
                   socket.transmit(new Command(DogueOps.Greet, serverName, username, "Looking up username..."))
                   if (Crypto.comparePassword(password, salt, hash)) {
                     socket.transmit(new Command(DogueOps.Greet, serverName, username, "Now identified as %s." format username))
                     socket.transmit(new Command(DogueOps.Greet, serverName, username, "Welcome!"))
+                    see(username)
+
                     success(username)
                     kill()
                   } else {
                     identFail("Password for user \"%s\" was incorrect" format username, username)
                   }
-                case None =>
+                case Left(_) =>
                   identFail("User not found or database connection could not be established.", username)
               }
 
@@ -107,6 +109,18 @@ object StarHandshake {
       if (iters <= 0) {
         handshakeFail("Timeout", socket)
       }
+    }
+
+
+    def see(name:String) = {
+
+      new DbConnection().see(name) match {
+        case Right(_) =>
+          Log.info("Updated last seen date of user " + name)
+        case Left(_) =>
+          Log.warn("Failed to update last seen date of user " + name)
+      }
+
     }
 
   }

@@ -41,7 +41,7 @@ class StarWorker(cmd:Command, connection:StarConnection, socket:DogueSocket) ext
           val (password, salt, hash) = Crypto.generatePassword
           Log.info(hash)
           Log.info(salt)
-          new DbConnection().setPassword(newNick, salt, hash)
+          new DbConnection().createUser(newNick, salt, hash)
           socket.transmit(Command(DogueOps.Assign, connection.serverName, command.source, Vector(newNick, password)))
         }
       case _ =>
