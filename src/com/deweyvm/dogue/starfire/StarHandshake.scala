@@ -33,7 +33,7 @@ object StarHandshake {
       new Identify(serverName, socket, success, failure).start()
     }
 
-    override def exception(t:Throwable) {
+    override def exception(t:Exception) {
       failure(socket)
     }
   }
@@ -59,7 +59,7 @@ object StarHandshake {
       kill()
     }
 
-    override def exception(t:Throwable) {
+    override def exception(t:Exception) {
       failure(socket)
     }
 

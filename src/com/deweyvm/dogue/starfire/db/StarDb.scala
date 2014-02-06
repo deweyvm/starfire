@@ -10,7 +10,7 @@ object StarDb {
   val user = DbSettings.user
   val password = DbSettings.password
 
-  private def warn[T](ex:Throwable):Left[String,T] = {
+  private def warn[T](ex:Exception):Left[String,T] = {
     val trace = Log.formatStackTrace(ex)
     Log.warn(trace)
     Left(Log.formatStackTrace(ex))
