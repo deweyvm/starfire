@@ -6,7 +6,7 @@ import com.deweyvm.dogue.common.protocol.{DogueOps, Invalid, Command}
 import com.deweyvm.dogue.common.logging.Log
 import com.badlogic.gdx.Gdx
 import com.deweyvm.dogue.common.data.Crypto
-import com.deweyvm.dogue.starfire.db.DbConnection
+import com.deweyvm.dogue.starfire.db.StarDb
 import com.deweyvm.dogue.common.procgen.Name
 
 //trait StarHandshakeState
@@ -81,7 +81,7 @@ object StarHandshake {
               }
               val username = args(0)
               val password = args(1)
-              val dbd = new DbConnection().getPassword(username)
+              val dbd = StarDb.getPassword(username)
               dbd match {
                 case Right((salt, hash)) =>
                   socket.transmit(new Command(DogueOps.Greet, serverName, username, "Looking up username..."))
@@ -114,7 +114,7 @@ object StarHandshake {
 
     def see(name:String) = {
 
-      new DbConnection().see(name) match {
+      StarDb.see(name) match {
         case Right(_) =>
           Log.info("Updated last seen date of user " + name)
         case Left(_) =>

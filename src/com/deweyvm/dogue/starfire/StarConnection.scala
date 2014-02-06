@@ -39,7 +39,7 @@ class StarConnection(val clientName:String, socket:DogueSocket, parent:Starfire,
   }
 
   def nickInUse(name:String):Boolean = {
-    parent.nickInUse(name)
+    parent.nickInUse(name, this)
   }
 
   def close() {

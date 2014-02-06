@@ -1,17 +1,11 @@
 package com.deweyvm.dogue.starfire
 
-import com.deweyvm.dogue.common.Implicits._
-import com.deweyvm.dogue.common.Functions._
-import java.net.Socket
 import com.deweyvm.dogue.common.logging.Log
 import com.deweyvm.dogue.common.threading.Task
 import com.deweyvm.dogue.common.io.DogueSocket
 import com.deweyvm.dogue.common.protocol.{DogueOps, Command}
-import com.deweyvm.dogue.common.parsing.CommandParser
-import com.deweyvm.dogue.common.data.{Crypto, Encoding, GenUtils}
-import java.security.{MessageDigest, SecureRandom}
-import com.deweyvm.dogue.starfire.db.DbConnection
-import com.deweyvm.dogue.common.procgen.Name
+import com.deweyvm.dogue.common.data.Crypto
+import com.deweyvm.dogue.starfire.db.StarDb
 
 class StarWorker(cmd:Command, connection:StarConnection, socket:DogueSocket) extends Task {
   override def doWork() {
@@ -35,14 +29,23 @@ class StarWorker(cmd:Command, connection:StarConnection, socket:DogueSocket) ext
         connection.pong()
         socket.transmit(Command(DogueOps.Pong, connection.serverName, command.source, Vector()))
 
-      case Nick =>
-        val newNick = command.args(0)
+      case Register =>
+        val newNick = command.source
         if (!connection.nickInUse(newNick)) {
           val (password, salt, hash) = Crypto.generatePassword
           Log.info(hash)
           Log.info(salt)
-          new DbConnection().createUser(newNick, salt, hash)
-          socket.transmit(Command(DogueOps.Assign, connection.serverName, command.source, Vector(newNick, password)))
+          StarDb.createUser(newNick, salt, hash) match {
+            case Right(_) =>
+              socket.transmit(Command(DogueOps.Assign, connection.serverName, command.source, Vector(newNick, password)))
+              socket.transmit(new Command(DogueOps.Greet, connection.serverName, command.source, "You have registered the name %s. Hope you like it!" format command.source))
+            case Left(_) =>
+              Log.warn("here")
+              socket.transmit(new Command(DogueOps.Greet, connection.serverName, command.source, "Unable to register: Database error"))
+          }
+
+        } else {
+          socket.transmit(Command(DogueOps.Greet, connection.serverName, command.source, Vector("That name is in use!")))
         }
       case _ =>
         Log.warn("Command \"%s\" unhandled in server." format command)

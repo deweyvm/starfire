@@ -7,16 +7,16 @@ import com.deweyvm.dogue.common.threading.Task
 import scala.collection.mutable.ArrayBuffer
 import com.deweyvm.dogue.common.io.{DogueSocket, DogueServer}
 import com.deweyvm.dogue.common.protocol.{DogueOps, Command}
-import com.deweyvm.dogue.starfire.db.DbConnection
+import com.deweyvm.dogue.starfire.db.StarDb
 import com.deweyvm.dogue.common.procgen.Name
 
 
 class Starfire(val name:String, port:Int) {
 
   var running = true
-  var readerId = 0
+  var connectionId = 0
 
-  var readers = ArrayBuffer[StarConnection]()
+  var connections = ArrayBuffer[StarConnection]()
   def execute() {
     Log.info("Starting server")
     val server = new DogueServer(name, port)
@@ -26,14 +26,14 @@ class Starfire(val name:String, port:Int) {
       val socket = server.accept()
       Log.info("Accepted connection")
       def onComplete(clientName:String) {
-        val (running, stopped) = readers partition { _.isRunning }
-        readers = running
+        val (running, stopped) = connections partition { _.isRunning }
+        connections = running
         stopped foreach { _.kill() }
         Log.all("Spawning reader")
-        val connection = new StarConnection(clientName, socket, this, readerId)
-        readerId += 1
+        val connection = new StarConnection(clientName, socket, this, connectionId)
+        connectionId += 1
         connection.start()
-        readers += connection
+        connections += connection
       }
 
       def onFailure(socket:DogueSocket) {
@@ -47,13 +47,13 @@ class Starfire(val name:String, port:Int) {
   }
 
   def broadcast(from:String, string:String) {
-    readers foreach { r =>
+    connections foreach { r =>
       r.write(Command(DogueOps.Say, from, r.clientName, Vector(string)))
     }
   }
 
-  def nickInUse(name:String):Boolean = {
-    readers exists {r => r.clientName == name}
+  def nickInUse(name:String, connection:StarConnection):Boolean = {
+    connections exists {r => r.clientName == name && connection != r}
   }
 
 }
