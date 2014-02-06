@@ -24,7 +24,7 @@ class StarWorker(cmd:Command, connection:StarConnection, socket:DogueSocket) ext
         Log.info("Close requested by " + command.source)
         connection.close()
       case Say =>
-        connection.broadcast(command.source, command.args(0))
+        connection.broadcast(connection.user.getPlainName, connection.user.getSigilName, command.args(1))
       case Ping =>
         connection.pong()
         socket.transmit(Command(DogueOps.Pong, connection.serverName, command.source, Vector()))

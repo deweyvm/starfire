@@ -58,7 +58,7 @@ object StarDb {
     try {
       val connection = DriverManager.getConnection(url, user, password)
       val p = connection.prepareStatement(
-        "UPDATE junk SET lastseen = ? WHERE username = ? ;"
+        "UPDATE dogueusers SET lastseen = ? WHERE username = ? ;"
       )
       p.setInt(1, Time.epochTime)
       p.setString(2, name)

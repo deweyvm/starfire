@@ -18,7 +18,7 @@ import com.deweyvm.dogue.common.procgen.Name
 class HandshakeTimeout extends Exception
 
 object StarHandshake {
-  type SuccessCallback = String => Unit
+  type SuccessCallback = (String,Boolean) => Unit
   type FailureCallback = DogueSocket => Unit
   def begin(serverName:String, socket:DogueSocket, success:SuccessCallback, failure:FailureCallback) {
     new Greeting(serverName, socket, success, failure).start()
@@ -48,7 +48,7 @@ object StarHandshake {
       socket.transmit(new Command(DogueOps.Reassign, serverName, newName, reason))
       socket.transmit(new Command(DogueOps.Greet, serverName, newName, "Naming you %s instead" format newName))
       socket.transmit(new Command(DogueOps.Greet, serverName, newName, "Welcome!"))
-      success(newName)
+      success(newName, false)
       kill()
     }
 
@@ -71,7 +71,7 @@ object StarHandshake {
               socket.transmit(new Command(DogueOps.Greet, serverName, src, "Welcome!"))
               socket.transmit(new Command(DogueOps.Greet, serverName, src, "You are called " + src))
 
-              success(src)
+              success(src, false)
               kill()
             case DogueOps.Identify =>
               Log.info("Attempting to authenticate user")
@@ -90,7 +90,7 @@ object StarHandshake {
                     socket.transmit(new Command(DogueOps.Greet, serverName, username, "Welcome!"))
                     see(username)
 
-                    success(username)
+                    success(username, true)
                     kill()
                   } else {
                     identFail("Password for user \"%s\" was incorrect" format username, username)

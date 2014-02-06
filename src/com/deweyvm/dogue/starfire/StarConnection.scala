@@ -4,9 +4,10 @@ import com.deweyvm.dogue.common.logging.Log
 import com.deweyvm.dogue.common.threading.{ThreadManager, Task}
 import com.deweyvm.dogue.common.io.DogueSocket
 import com.deweyvm.dogue.common.protocol.{Invalid, Command, DogueMessage}
+import com.deweyvm.dogue.starfire.entities.User
 
 
-class StarConnection(val clientName:String, socket:DogueSocket, parent:Starfire, id:Int) extends Task {
+class StarConnection(val user:User, socket:DogueSocket, parent:Starfire, id:Int) extends Task {
   def serverName = parent.name
   private val ponger = ThreadManager.spawn(new StarPonger(this))
   socket.setTimeout(500)
@@ -16,7 +17,7 @@ class StarConnection(val clientName:String, socket:DogueSocket, parent:Starfire,
   }
 
   override def cleanup() {
-    Log.info("Connection to \"%s\" closed" format clientName)
+    Log.info("Connection to \"%s\" closed" format user.getPlainName)
     ponger.kill()
   }
 
@@ -34,8 +35,8 @@ class StarConnection(val clientName:String, socket:DogueSocket, parent:Starfire,
     ponger.pong()
   }
 
-  def broadcast(from:String, string:String) {
-    parent.broadcast(from, string)
+  def broadcast(from:String, sigilName:String, string:String) {
+    parent.broadcast(from, sigilName, string)
   }
 
   def nickInUse(name:String):Boolean = {
