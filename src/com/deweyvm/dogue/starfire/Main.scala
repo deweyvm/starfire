@@ -17,16 +17,17 @@ object Main {
       opt[Int]("port") action { (x, c) =>
         c.copy(port = x)
       } text "port to connect to"
+
       checkConfig { c =>
         if (c.port == 0) failure("port cannot be 0") else success
       }
     }
     parser.parse(args, StarfireOptions()) map { c =>
       Log.initLog(c.logDir, Log.Verbose)
-      new Starfire("SERVER(flare)", c.port).execute()
+      new Starfire("SERVER(flare)", c.port)
+      ()
     } getOrElse {
       println(parser.usage)
-      throw new RuntimeException("invalid args")
     }
 
   }
