@@ -31,7 +31,9 @@ class StarWorker(cmd:Command, connection:StarConnection, socket:DogueSocket) ext
 
       case Register =>
         val newNick = command.source
-        if (!connection.nickInUse(newNick)) {
+        if (connection.user.isRegistered) {
+          socket.transmit(new Command(DogueOps.Greet, connection.serverName, command.source, "Already registererd"))
+        } else if (!connection.nickInUse(newNick)) {
           val (password, salt, hash) = Crypto.generatePassword
           Log.info(hash)
           Log.info(salt)
