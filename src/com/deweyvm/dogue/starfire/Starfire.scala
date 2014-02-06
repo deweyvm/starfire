@@ -26,7 +26,7 @@ class Starfire(val name:String, port:Int) {
     while(running) {
       Log.info("Awaiting connections on port " + port)
       val socket = server.accept()
-      Log.info("Accepted connection")
+      Log.info("Accepted connection from " + socket.ip)
       def onComplete(clientName:String, isRegistered:Boolean) {
         val (running, stopped) = connections partition { _.isRunning }
         connections = running
