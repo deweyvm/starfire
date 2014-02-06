@@ -37,17 +37,18 @@ object StarDb {
     }
   }
 
-  def getPassword(name:String):Either[String, (String,String)] = {
+  def getPassword(name:String):Either[String, (String,String,String)] = {
     try {
       val connection = DriverManager.getConnection(url, user, password)
-      val p = connection.prepareStatement("SELECT salt, hash FROM dogueusers where username=? ;")
+      val p = connection.prepareStatement("SELECT salt, hash, lastseen FROM dogueusers where username=? ;")
       p.setString(1, name)
       val result = p.executeQuery()
       result.next()
       val salt = result.getString("salt")
       val hash = result.getString("hash")
+      val lastSeen = result.getString("lastseen")
       p.close()
-      Right((salt, hash))
+      Right((salt, hash, lastSeen))
     } catch {
       case ex:SQLException =>
         warn(ex)

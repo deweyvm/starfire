@@ -8,6 +8,7 @@ import com.badlogic.gdx.Gdx
 import com.deweyvm.dogue.common.data.Crypto
 import com.deweyvm.dogue.starfire.db.StarDb
 import com.deweyvm.dogue.common.procgen.Name
+import com.deweyvm.gleany.data.Time
 
 //trait StarHandshakeState
 //
@@ -83,10 +84,12 @@ object StarHandshake {
               val password = args(1)
               val dbd = StarDb.getPassword(username)
               dbd match {
-                case Right((salt, hash)) =>
+                case Right((salt, hash, lastSeen)) =>
                   socket.transmit(new Command(DogueOps.Greet, serverName, username, "Looking up username..."))
                   if (Crypto.comparePassword(password, salt, hash)) {
+                    val date = Time.epochToDate(lastSeen.toInt)
                     socket.transmit(new Command(DogueOps.Greet, serverName, username, "Now identified as %s." format username))
+                    socket.transmit(new Command(DogueOps.Greet, serverName, username, "Last login on %s." format date))
                     socket.transmit(new Command(DogueOps.Greet, serverName, username, "Welcome!"))
                     see(username)
 
