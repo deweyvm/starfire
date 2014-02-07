@@ -2,9 +2,8 @@ package com.deweyvm.dogue.starfire
 
 import com.deweyvm.dogue.common.io.DogueSocket
 import com.deweyvm.dogue.common.threading.Task
-import com.deweyvm.dogue.common.protocol.{DogueOps, Invalid, Command}
+import com.deweyvm.dogue.common.protocol.{DogueOps, Command}
 import com.deweyvm.dogue.common.logging.Log
-import com.badlogic.gdx.Gdx
 import com.deweyvm.dogue.common.data.Crypto
 import com.deweyvm.dogue.starfire.db.StarDb
 import com.deweyvm.dogue.common.procgen.Name
