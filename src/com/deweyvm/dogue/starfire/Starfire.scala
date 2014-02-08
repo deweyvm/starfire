@@ -65,7 +65,7 @@ class StarfireInstance(val name:String, port:Int) {
       val user = new User(clientName, isRegistered)
       val connection = new StarConnection(user, socket, this)
       connection.start()
-      connections += connection
+      connections.append(connection)
     }
 
     def onFailure(socket:DogueSocket) {

@@ -8,7 +8,8 @@ import com.deweyvm.dogue.common.data.Crypto
 import com.deweyvm.dogue.starfire.db.StarDb
 import com.deweyvm.dogue.common.procgen.Name
 import com.deweyvm.gleany.data.Time
-
+import com.deweyvm.dogue.common.Implicits
+import Implicits._
 //trait StarHandshakeState
 //
 //object StarHandshake {
@@ -21,7 +22,7 @@ object StarHandshake {
   type SuccessCallback = (String,Boolean) => Unit
   type FailureCallback = DogueSocket => Unit
   def begin(serverName:String, socket:DogueSocket, success:SuccessCallback, failure:FailureCallback) {
-    new Greeting(serverName, socket, success, failure).start()
+    new Greeting(serverName, socket, success, failure).start().ignore()
   }
 
   class Greeting(serverName:String, socket:DogueSocket, success:SuccessCallback, failure:FailureCallback) extends Task {
@@ -29,7 +30,7 @@ object StarHandshake {
       Log.info("Greeting client")
       socket.transmit(new Command(DogueOps.Greet, serverName, Name.unknown, "identify"))
       kill()
-      new Identify(serverName, socket, success, failure).start()
+      new Identify(serverName, socket, success, failure).start().ignore()
     }
 
     override def exception(t:Exception) {
