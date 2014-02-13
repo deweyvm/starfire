@@ -27,7 +27,7 @@ object Main {
       new Starfire("SERVER(flare)", c.port)
       ()
     } getOrElse {
-      println(parser.usage)
+      System.err.print(parser.usage + "\n")
     }
 
   }
