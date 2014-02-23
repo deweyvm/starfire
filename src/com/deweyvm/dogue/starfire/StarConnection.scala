@@ -7,7 +7,7 @@ import com.deweyvm.dogue.common.protocol.{Invalid, Command, DogueMessage}
 import com.deweyvm.dogue.starfire.entities.User
 
 
-class StarConnection(val user:User, socket:DogueSocket, parent:StarfireInstance) extends Task {
+class StarConnection(val user:User, socket:DogueSocket, parent:StarfireInstance, time:String) extends Task {
   def serverName = parent.name
   private val ponger = ThreadManager.spawn(new StarPonger(this))
   socket.setTimeout(500)
@@ -17,7 +17,7 @@ class StarConnection(val user:User, socket:DogueSocket, parent:StarfireInstance)
   }
 
   override def cleanup() {
-    Log.info("Connection to \"%s\" closed." format user.getPlainName)
+    Log.info("Connection to \"%s\" established at %s closed." format (user.getPlainName, time))
     ponger.kill()
   }
 

@@ -63,7 +63,7 @@ class StarfireInstance(val name:String, port:Int) {
       stopped foreach { _.kill() }
       Log.info("Spawning reader " + isRegistered)
       val user = new User(clientName, isRegistered)
-      val connection = new StarConnection(user, socket, this)
+      val connection = new StarConnection(user, socket, this, Time.epochToDate(Time.epochTime))
       connection.start()
       connections.append(connection)
     }
