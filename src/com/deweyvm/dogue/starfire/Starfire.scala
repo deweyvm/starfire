@@ -61,7 +61,7 @@ class StarfireInstance(val name:String, port:Int) {
       val (running, stopped) = connections partition { _.isRunning }
       connections = running
       stopped foreach { _.kill() }
-      Log.info("Spawning reader " + isRegistered)
+      Log.info("Spawning reader registered(%s)" format isRegistered.toString)
       val user = new User(clientName, isRegistered)
       val connection = new StarConnection(user, socket, this, Time.epochToDate(Time.epochTime))
       connection.start()

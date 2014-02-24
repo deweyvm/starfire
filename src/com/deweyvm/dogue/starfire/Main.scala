@@ -1,6 +1,6 @@
 package com.deweyvm.dogue.starfire
 
-import com.deweyvm.dogue.common.logging.Log
+import com.deweyvm.dogue.common.logging.{LogLevel, Log}
 
 
 
@@ -14,6 +14,10 @@ object Main {
         c.copy(logDir = x)
       } text "directory to place logs"
 
+      opt[String]("log-level") action { (v, c) =>
+        c.copy(logLevel = v)
+      } text ("log level = {%s}" format Log.levels.map{_.toString.toLowerCase}.mkString(","))
+
       opt[Int]("port") action { (x, c) =>
         c.copy(port = x)
       } text "port to connect to"
@@ -23,7 +27,8 @@ object Main {
       }
     }
     parser.parse(args, StarfireOptions()) map { c =>
-      Log.initLog(c.logDir, Log.Verbose)
+      val logLevel = LogLevel.fromString(c.logLevel)
+      Log.initLog(c.logDir, logLevel)
       new Starfire("SERVER(flare)", c.port)
       ()
     } getOrElse {
