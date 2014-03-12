@@ -39,6 +39,10 @@ class StarConnection(val user:User, socket:DogueSocket, parent:StarfireInstance,
     parent.broadcast(from, sigilName, string)
   }
 
+  def register() {
+    user.isRegistered = true
+  }
+
   def nickInUse(name:String):Boolean = {
     parent.nickInUse(name, this)
   }

@@ -33,7 +33,7 @@ class StarWorker(cmd:Command, connection:StarConnection, socket:DogueSocket) ext
         val newNick = command.source
         if (connection.user.isRegistered) {
           socket.transmit(new Command(DogueOps.Greet, connection.serverName, command.source, "Already registererd"))
-        } else if (!connection.nickInUse(newNick)) {
+        } else {
           val (password, salt, hash) = Crypto.generatePassword
           Log.info(hash)
           Log.info(salt)
@@ -41,13 +41,11 @@ class StarWorker(cmd:Command, connection:StarConnection, socket:DogueSocket) ext
             case Right(_) =>
               socket.transmit(Command(DogueOps.Assign, connection.serverName, command.source, Vector(newNick, password)))
               socket.transmit(new Command(DogueOps.Greet, connection.serverName, command.source, "You have registered the name %s. Hope you like it!" format command.source))
+              connection.register()
             case Left(_) =>
-              Log.warn("here")
               socket.transmit(new Command(DogueOps.Greet, connection.serverName, command.source, "Unable to register: Database error"))
           }
 
-        } else {
-          socket.transmit(Command(DogueOps.Greet, connection.serverName, command.source, Vector("That name is in use!")))
         }
       case _ =>
         Log.warn("Command \"%s\" unhandled in server." format command)
