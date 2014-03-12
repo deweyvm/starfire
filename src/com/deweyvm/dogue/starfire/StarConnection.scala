@@ -3,7 +3,7 @@ package com.deweyvm.dogue.starfire
 import com.deweyvm.dogue.common.logging.Log
 import com.deweyvm.dogue.common.threading.{ThreadManager, Task}
 import com.deweyvm.dogue.common.io.DogueSocket
-import com.deweyvm.dogue.common.protocol.{Invalid, Command, DogueMessage}
+import com.deweyvm.dogue.common.protocol.DogueMessage
 import com.deweyvm.dogue.starfire.entities.User
 
 
