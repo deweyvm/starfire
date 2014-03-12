@@ -8,8 +8,8 @@ import com.deweyvm.dogue.common.data.Crypto
 import com.deweyvm.dogue.starfire.db.StarDb
 import com.deweyvm.dogue.common.procgen.Name
 import com.deweyvm.gleany.data.Time
-import com.deweyvm.dogue.common.Implicits
-import Implicits._
+import com.deweyvm.dogue.common.CommonImplicits
+import CommonImplicits._
 //trait StarHandshakeState
 //
 //object StarHandshake {

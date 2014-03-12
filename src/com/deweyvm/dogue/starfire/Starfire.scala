@@ -1,7 +1,7 @@
 package com.deweyvm.dogue.starfire
 
 import java.net.{Socket, SocketTimeoutException, ServerSocket}
-import com.deweyvm.dogue.common.Implicits._
+import com.deweyvm.dogue.common.CommonImplicits._
 import com.deweyvm.dogue.common.logging.Log
 import com.deweyvm.dogue.common.threading.Task
 import scala.collection.mutable.ArrayBuffer
