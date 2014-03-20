@@ -69,7 +69,6 @@ class StarfireInstance(val name:String, port:Int) {
       socket.close()
     }
     StarHandshake.begin(name, socket, onComplete, onFailure)
-
   }
 
   def broadcast(from:String, sigilName:String, s:String) {
