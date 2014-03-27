@@ -65,8 +65,13 @@ class StarfireInstance(val name:String, port:Int) {
     }
 
     def onFailure(socket:DogueSocket) {
-      socket.transmit(new Command(DogueOps.Close, name, Name.unknown))
-      socket.close()
+      try {
+        Log.warn("Handshake failure")
+        socket.transmit(new Command(DogueOps.Close, name, Name.unknown))
+        socket.close()
+      } catch {
+        case e:Exception => Log.warn("Socket already closed")
+      }
     }
     StarHandshake.begin(name, socket, onComplete, onFailure)
   }
